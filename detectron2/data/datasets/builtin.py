@@ -206,12 +206,22 @@ def register_all_pascal_voc(root="datasets"):
         MetadataCatalog.get(name).evaluator_type = "pascal_voc"
 #===================
 #### self defined dataset
+import numpy as np
+import json
+dump_jname = 'anno4.json' # all data anno3.json
+spath = osp.join('..','prepro',dump_jname)
+with open(spath) as f:
+    dicts = json.load(f)
+all_ind = np.arange(len(dicts))
+test_ind = np.random.choice(all_ind, size=int(.1*len(all_ind)), replace=False)
+trn_ind = np.array(set(all_ind)-set(test_ind))
 def get_dicts(split):
     imgdir = osp.join('..','data')
     return_dicts = list()
     mapping = dict(filename='file_name',height='height',width='width',annotations='annotations')
     global dicts
-    for d in dicts:
+    tmp_dicts = dicts[trn_ind] if split=='train' else dicts[test_ind]
+    for d in tmp_dicts:
         tmp = {mapping[k]:v for k,v in d.items()}
         tmp['annotations'] = [dict(bbox=bbox,
                                        bbox_mode=BoxMode.XYXY_ABS,
@@ -220,7 +230,7 @@ def get_dicts(split):
         return_dicts.append(tmp)
     return return_dicts
 def register_all_particle(root="datasets"):
-    for split in ['train','val','test']:
+    for split in ['train','test']:
         ds_name = f'particle_{split}'
         DatasetCatalog.register(ds_name, lambda: get_dicts(split))  # register a dataset
         MetadataCatalog.get(ds_name).set(thing_classes=['positive'])  # register the categories for the dataset
@@ -231,3 +241,4 @@ register_all_coco()
 register_all_lvis()
 register_all_cityscapes()
 register_all_pascal_voc()
+register_all_particle()
