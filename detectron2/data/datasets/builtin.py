@@ -18,14 +18,14 @@ To add new dataset, refer to the tutorial "docs/DATASETS.md".
 """
 
 import os
-
+import os.path as osp
 from detectron2.data import MetadataCatalog, DatasetCatalog
 from .register_coco import register_coco_instances, register_coco_panoptic_separated
 from .lvis import register_lvis_instances, get_lvis_instances_meta
 from .cityscapes import load_cityscapes_instances, load_cityscapes_semantic
 from .pascal_voc import register_pascal_voc
 from .builtin_meta import _get_builtin_metadata
-
+from detectron2.structures import BoxMode
 
 # ==== Predefined datasets and splits for COCO ==========
 
@@ -204,6 +204,26 @@ def register_all_pascal_voc(root="datasets"):
         year = 2007 if "2007" in name else 2012
         register_pascal_voc(name, os.path.join(root, dirname), split, year)
         MetadataCatalog.get(name).evaluator_type = "pascal_voc"
+#===================
+#### self defined dataset
+def get_dicts(split):
+    imgdir = osp.join('..','data')
+    return_dicts = list()
+    mapping = dict(filename='file_name',height='height',width='width',annotations='annotations')
+    global dicts
+    for d in dicts:
+        tmp = {mapping[k]:v for k,v in d.items()}
+        tmp['annotations'] = [dict(bbox=bbox,
+                                       bbox_mode=BoxMode.XYXY_ABS,
+#                                        segmentation=list(),
+                                       category_id=0,is_crowd=0) for bbox in tmp['annotations']]
+        return_dicts.append(tmp)
+    return return_dicts
+def register_all_particle(root="datasets"):
+    for split in ['train','val','test']:
+        ds_name = f'particle_{split}'
+        DatasetCatalog.register(ds_name, lambda: get_dicts(split))  # register a dataset
+        MetadataCatalog.get(ds_name).set(thing_classes=['positive'])  # register the categories for the dataset
 
 
 # Register them all under "./datasets"
