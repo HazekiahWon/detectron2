@@ -15,6 +15,13 @@ also installs detectron2 with a few simple commands.
 - pycocotools: `pip install cython; pip install 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'`
 - GCC >= 4.9
 
+### Building the project
+- build detectron  
+`python setup.py build develop`   
+- prepare data  
+`python prepro/divide_patch.py`  
+- generate coco-style annotations  
+`python prepro/gen_anno.py`
 
 ### Build detectron2
 
