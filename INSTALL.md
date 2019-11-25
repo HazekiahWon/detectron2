@@ -21,7 +21,9 @@ also installs detectron2 with a few simple commands.
 - prepare data  
 `python prepro/divide_patch.py`  
 - generate coco-style annotations  
-`python prepro/gen_anno.py`
+`python prepro/gen_anno.py`  
+- download model weights  
+refer to [this link](https://github.com/facebookresearch/detectron2/blob/master/MODEL_ZOO.md).
 - train the model  
 
 `sh tools/train2.sh`
