@@ -22,6 +22,8 @@ also installs detectron2 with a few simple commands.
 `python prepro/divide_patch.py`  
 - generate coco-style annotations  
 `python prepro/gen_anno.py`
+- train the model  
+`sh tools/train2.sh`
 
 ### Build detectron2
 
