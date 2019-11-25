@@ -1,0 +1,8 @@
+_BASE_: "../COCO-Detection/faster_rcnn_R_50_C4_3x.yaml"
+DATASETS:
+  TRAIN: ("particle_train",)
+  TEST: ("particle_test",)
+MODEL:
+  WEIGHTS: "model_weights/COCO-Detection/faster_rcnn_R_50_C4_3x/model_final_f97cb7.pkl"
+SOLVER:
+  OPTIMIZER: "Adam"
