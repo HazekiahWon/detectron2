@@ -482,7 +482,7 @@ _C.SOLVER.MAX_ITER = 40000
 _C.SOLVER.BASE_LR = 0.001
 
 _C.SOLVER.MOMENTUM = 0.9
-
+_C.SOLVER.OPTIMIZER= "Adam"
 _C.SOLVER.WEIGHT_DECAY = 0.0001
 # The weight decay that's applied to parameters of normalization layers
 # (typically the affine transformation)
