@@ -123,15 +123,21 @@ class TrainerBase:
 
         self.iter = self.start_iter = start_iter
         self.max_iter = max_iter
-
+        logger = logging.getLogger(__name__)
         with EventStorage(start_iter) as self.storage:
             try:
+                # logger.info('into before train')
                 self.before_train()
+                logger.info(f'into training {start_iter}->{max_iter}')
                 for self.iter in range(start_iter, max_iter):
+                    # logger.info(f'{self.iter} stepping')
                     self.before_step()
                     self.run_step()
+                    # logger.info('into after step')
                     self.after_step()
+                    # logger.info('stepping finish')
             finally:
+                # logger.info('finally into after train')
                 self.after_train()
 
     def before_train(self):
@@ -205,25 +211,28 @@ class SimpleTrainer(TrainerBase):
         """
         data = next(self._data_loader_iter)
         data_time = time.perf_counter() - start
-
+        logger = logging.getLogger(__name__)
+        logger.info('in run_step')
+        # logger.info(f'{type(data)}')
         """
         If your want to do something with the losses, you can wrap the model.
         """
         loss_dict = self.model(data)
+        # logger.info(f'loss dict length {len(loss_dict)}')
         losses = sum(loss for loss in loss_dict.values())
         self._detect_anomaly(losses, loss_dict)
-
+        # logger.info('anomaly')
         metrics_dict = loss_dict
         metrics_dict["data_time"] = data_time
         self._write_metrics(metrics_dict)
-
+        # logger.info('metric')
         """
         If you need accumulate gradients or something similar, you can
         wrap the optimizer with your custom `zero_grad()` method.
         """
         self.optimizer.zero_grad()
         losses.backward()
-
+        logger.info('backward')
         """
         If you need gradient clipping/scaling or other processing, you can
         wrap the optimizer with your custom `step()` method.

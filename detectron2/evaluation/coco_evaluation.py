@@ -83,6 +83,7 @@ class COCOEvaluator(DatasetEvaluator):
             outputs: the outputs of a COCO model. It is a list of dicts with key
                 "instances" that contains :class:`Instances`.
         """
+
         for input, output in zip(inputs, outputs):
             prediction = {"image_id": input["image_id"]}
 

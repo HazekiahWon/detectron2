@@ -25,6 +25,8 @@ from .lvis import register_lvis_instances, get_lvis_instances_meta
 from .cityscapes import load_cityscapes_instances, load_cityscapes_semantic
 from .pascal_voc import register_pascal_voc
 from .builtin_meta import _get_builtin_metadata
+from .particle import get_particle_dicts
+import numpy as np
 from detectron2.structures import BoxMode
 
 # ==== Predefined datasets and splits for COCO ==========
@@ -204,36 +206,13 @@ def register_all_pascal_voc(root="datasets"):
         year = 2007 if "2007" in name else 2012
         register_pascal_voc(name, os.path.join(root, dirname), split, year)
         MetadataCatalog.get(name).evaluator_type = "pascal_voc"
-#===================
-#### self defined dataset
-import numpy as np
-import json
-dump_jname = 'anno4.json' # all data anno3.json
-spath = osp.join('prepro',dump_jname)
-with open(spath) as f:
-    dicts = json.load(f)
-all_ind = np.arange(len(dicts))
-test_ind = np.random.choice(all_ind, size=int(.1*len(all_ind)), replace=False)
-trn_ind = np.array(set(all_ind)-set(test_ind))
-def get_dicts(split):
-    # imgdir = osp.join('..','data')
-    return_dicts = list()
-    mapping = dict(filename='file_name',height='height',width='width',annotations='annotations')
-    global dicts
-    tmp_dicts = (dicts[i] for i in trn_ind) if split=='train' else (dicts[i] for i in test_ind)
-    for d in tmp_dicts:
-        tmp = {mapping[k]:v for k,v in d.items()}
-        tmp['annotations'] = [dict(bbox=bbox,
-                                       bbox_mode=BoxMode.XYXY_ABS,
-#                                        segmentation=list(),
-                                       category_id=0,is_crowd=0) for bbox in tmp['annotations']]
-        return_dicts.append(tmp)
-    return return_dicts
+
 def register_all_particle(root="datasets"):
     for split in ['train','test']:
         ds_name = f'particle_{split}'
-        DatasetCatalog.register(ds_name, lambda: get_dicts(split))  # register a dataset
-        MetadataCatalog.get(ds_name).set(thing_classes=['positive'], evaluator_type='particle')  # register the categories for the dataset
+        ind = np.load(osp.join('prepro', f'{split}_ind.npy'))
+        DatasetCatalog.register(ds_name, lambda : get_particle_dicts(ind))  # register a dataset
+        MetadataCatalog.get(ds_name).set(thing_classes=['positive'], evaluator_type='particle', json_file=osp.join('prepro',f'{split}_anno.json'))  # register the categories for the dataset
 
 
 # Register them all under "./datasets"

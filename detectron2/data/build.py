@@ -323,7 +323,7 @@ def build_detection_train_loader(cfg, mapper=None):
         if cfg.MODEL.KEYPOINT_ON
         else 0,
         proposal_files=cfg.DATASETS.PROPOSAL_FILES_TRAIN if cfg.MODEL.LOAD_PROPOSALS else None,
-    )
+    ) # list of dict(file_name, height, width, annotations), from get_dicts() defined in datasets\buitin.py
     dataset = DatasetFromList(dataset_dicts, copy=False)
 
     # Bin edges for batching images with similar aspect ratios. If ASPECT_RATIO_GROUPING
@@ -333,7 +333,8 @@ def build_detection_train_loader(cfg, mapper=None):
 
     if mapper is None:
         mapper = DatasetMapper(cfg, True)
-    dataset = MapDataset(dataset, mapper)
+
+    dataset = MapDataset(dataset, mapper) # read in the image: list of dict(file_name, height, width, image::tensor, instances::Instances)
 
     sampler_name = cfg.DATALOADER.SAMPLER_TRAIN
     logger = logging.getLogger(__name__)

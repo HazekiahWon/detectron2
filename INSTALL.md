@@ -20,6 +20,7 @@ also installs detectron2 with a few simple commands.
 `python setup.py build develop`   
 - prepare data  
 `python prepro/divide_patch.py`  
+`python prepro/prepare_ds.py`
 - generate coco-style annotations  
 `python prepro/gen_anno.py`  
 - download model weights  
