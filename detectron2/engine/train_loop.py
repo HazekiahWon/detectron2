@@ -212,7 +212,7 @@ class SimpleTrainer(TrainerBase):
         data = next(self._data_loader_iter)
         data_time = time.perf_counter() - start
         logger = logging.getLogger(__name__)
-        logger.info('in run_step')
+        # logger.info('in run_step')
         # logger.info(f'{type(data)}')
         """
         If your want to do something with the losses, you can wrap the model.
@@ -232,7 +232,7 @@ class SimpleTrainer(TrainerBase):
         """
         self.optimizer.zero_grad()
         losses.backward()
-        logger.info('backward')
+        # logger.info('backward')
         """
         If you need gradient clipping/scaling or other processing, you can
         wrap the optimizer with your custom `step()` method.
