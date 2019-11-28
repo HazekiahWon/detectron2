@@ -22,7 +22,7 @@ def get_dicts(dicts, trn_ind):
     return return_dicts
 
 def gen_json(dicts, split):
-    folder = r'/group/liuyf/RefSegDatasets/refseg_anno/mscoco_anno'
+    folder = r'external'
     with open(osp.join(folder, 'instances_val2014.json')) as f:
         x = json.load(f)
     paste = dict()

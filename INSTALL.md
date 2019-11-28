@@ -19,6 +19,7 @@ also installs detectron2 with a few simple commands.
 - build detectron  
 `python setup.py build develop`   
 - prepare data  
+put `'/group/liuyf/RefSegDatasets/refseg_anno/mscoco_anno/instances_val2014.json'` under `external`
 `python prepro/divide_patch.py`  
 `python prepro/prepare_ds.py`
 - generate coco-style annotations  
