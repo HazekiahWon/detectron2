@@ -93,7 +93,10 @@ cnt2 = 0
 for k,g in df.groupby('realname'):
     filename = osp.join(os.path.abspath('.'), k).replace('micrographs', 'data')
     cnt1 += 1
-    if not get_part_id(filename) in allowed: continue
+    partname = get_part_id(filename)
+    if not partname in allowed:
+        print(filename, partname)
+        continue
     cnt2 += 1
     h,w = rstride, cstride
     g = g[['ofl','ofu','ofr','ofd']].values.tolist()
