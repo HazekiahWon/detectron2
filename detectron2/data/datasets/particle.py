@@ -4,7 +4,7 @@ import os.path as osp
 import numpy as np
 import json
 from detectron2.structures import BoxMode
-
+bfolder = 'anno'
 def get_dicts(dicts, trn_ind):
     # imgdir = osp.join('..','data')
     return_dicts = list()
@@ -47,15 +47,15 @@ def gen_json(dicts, split):
     paste['images'] = images
     paste['annotations'] = annos
 
-    savepath = osp.join('prepro', f'{split}_anno.json')
+    savepath = osp.join(bfolder, f'{split}_coco_anno.json')
     with open(savepath, 'w') as f:
         json.dump(paste, f)
 
     print(f'saved to {savepath}.')
 
 def get_particle_dicts(trn_ind):
-    dump_jname = 'anno4.json'  # all data anno3.json
-    spath = osp.join('prepro', dump_jname)
+    dump_jname = 'patches.json'  # all data anno3.json
+    spath = osp.join(bfolder, dump_jname)
     with open(spath) as f:
         dicts = json.load(f)
     # trn_ind = np.load(osp.join('prepro', 'train_ind.npy'))

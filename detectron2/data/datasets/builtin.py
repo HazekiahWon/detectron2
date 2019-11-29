@@ -208,11 +208,16 @@ def register_all_pascal_voc(root="datasets"):
         MetadataCatalog.get(name).evaluator_type = "pascal_voc"
 
 def register_all_particle(root="datasets"):
+    folder = 'anno'
+    if not os.path.exists(osp.join(folder, 'train_ind.npy')):
+        print('no train_ind.npy exist.')
+        return
     for split in ['train','test']:
         ds_name = f'particle_{split}'
-        ind = np.load(osp.join('prepro', f'{split}_ind.npy'))
+        ind = np.load(osp.join(folder, f'{split}_ind.npy'))
         DatasetCatalog.register(ds_name, lambda : get_particle_dicts(ind))  # register a dataset
-        MetadataCatalog.get(ds_name).set(thing_classes=['positive'], evaluator_type='particle', json_file=osp.join('prepro',f'{split}_anno.json'))  # register the categories for the dataset
+        MetadataCatalog.get(ds_name).set(thing_classes=['positive'], evaluator_type='particle',
+                                         json_file=osp.join(folder,f'{split}_coco_anno.json'))  # register the categories for the dataset
 
 
 # Register them all under "./datasets"

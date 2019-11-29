@@ -19,11 +19,12 @@ also installs detectron2 with a few simple commands.
 - build detectron  
 `python setup.py build develop`   
 - prepare data  
+`python convert_mrc.py` to convert the original mrc files into png.  
+`python prepro/divide_patch.py` to divide patches from the holistic mrc files.  
+`python prepro/make_csv.py` to generate csv file from the `particles.star`. The resulting csv is `anno/particles.csv`.  
+`python prepro/gen_anno.py` to generate json for the patches.  
 put `'/group/liuyf/RefSegDatasets/refseg_anno/mscoco_anno/instances_val2014.json'` under `external`
-`python prepro/divide_patch.py`  
-`python prepro/prepare_ds.py`
-- generate coco-style annotations  
-`python prepro/gen_anno.py`  
+`python prepro/prepare_ds.py` makes train-test splits and coco json from `patches.json`
 - download model weights  
 refer to [this link](https://github.com/facebookresearch/detectron2/blob/master/MODEL_ZOO.md).
 - train the model  

@@ -140,15 +140,18 @@ def proc_im(imgp, sigma=1., ratio=.99, nsig=1.):
     return img2.astype(np.uint8)
 
 if __name__ == '__main__':
-    opath = osp.join('odata')
-    tpath = osp.join('data')
+    opath = osp.join('odata_mrc')
+    tpath = osp.join('odata_png')
     os.makedirs(tpath, exist_ok=True)
 
-    for m in os.listdir(opath)[:20]:
+    for m in os.listdir(opath):
+        name = m.split('.')[0]
+        if os.path.exists(osp.join(tpath, f'{name}.png')):
+            print(f'{m} already processed, skip.')
+            continue
         mrcpath = osp.join(opath, m)
         print(f'processing {m}')
         out = proc_im(mrcpath, sigma=1.5, ratio=0.6, nsig=1)
-        name = m.split('.')[0]
         save_im(out, osp.join(tpath, f'{name}.png'))
     # impath = osp.join(opath, 'BGal_000433.mrc')
     # img = mrcread(impath)
