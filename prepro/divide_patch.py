@@ -4,9 +4,9 @@ from PIL import Image
 sfolder = osp.join('odata_png')
 tfolder = osp.join('data')
 os.makedirs(tfolder, exist_ok=True)
-
-patch_h,patch_w = 371*4,101*19# 7420,7676
-max_hn,max_wn = 7420//patch_h, 7676//patch_w
+h,w = 7676,7420
+patch_w,patch_h = 1484,1919#371*4,101*19# 7420,7676
+max_hn,max_wn = h//patch_h, w//patch_w
 imglist = os.listdir(sfolder)
 radius = 200
 for imname in imglist:

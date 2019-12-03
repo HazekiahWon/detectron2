@@ -1,10 +1,4 @@
-import mrcfile
 import os
-import os.path as osp
-import matplotlib.pyplot as plt
-from PIL import Image
-import numpy as np
-from scipy import ndimage as ndi
 mrclist = os.listdir('data')
 import mrcfile
 import os
@@ -61,38 +55,6 @@ def bin_2d(body_2d, bin_size):
     return body_2d_bin
 def low_pass(micrograph, sigma=0.1): return ndi.filters.gaussian_filter(micrograph, sigma)
 def binning(micrograph, poolsize=3): return bin_2d(micrograph, poolsize)
-def prepro(micrograph):
-# lowpass
-    micrograph = ndi.filters.gaussian_filter(micrograph, 0.1)
-    # do the bin process
-    pooling_size = 3
-    micrograph = bin_2d(micrograph, pooling_size)
-
-    # low pass the micrograph
-    #micrograph_lowpass = scipy.ndimage.filters.gaussian_filter(micrograph, 0.1)
-    #f = np.fft.fft2(micrograph)
-    #fshift = np.fft.fftshift(f)
-    #magnitude_spectrum = 20*np.log(np.abs(fshift))
-
-    #plt.subplot(121),plt.imshow(micrograph, cmap = 'gray')
-    #plt.title('Input Image'), plt.xticks([]), plt.yticks([])
-    #plt.subplot(122),plt.imshow(micrograph_lowpass, cmap = 'gray')
-    #plt.title('Magnitude Spectrum'), plt.xticks([]), plt.yticks([])
-    #plt.show()
-
-    # nomalize the patch
-    max_value = micrograph.max()
-    min_value = micrograph.min()
-    particle = (micrograph - min_value)/(max_value - min_value)
-    mean_value = micrograph.mean()
-    std_value = micrograph.std()
-    micrograph = (micrograph - mean_value)/std_value
-    #
-    return micrograph, pooling_size
-
-def whiten(img2):
-    img3 = (img2-img2.mean())/(img2.std())
-    return img3
 
 def rescale(x):
     x = x.astype(np.float)

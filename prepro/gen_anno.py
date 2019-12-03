@@ -6,8 +6,9 @@ import os.path as osp
 spath = osp.join('anno','particles.csv')
 tpath = osp.join('anno', 'patches.csv')
 usecols = ['_rlnCoordinateX', '_rlnCoordinateY', '_rlnMicrographName']
-rstride, cstride = 371 * 4, 101 * 19# 7420,7676
-max_nr,max_nc = 7420 // rstride, 7676 // cstride
+h,w = 7676,7420
+rstride, cstride = 1919, 1484
+max_nr,max_nc = h // rstride, w // cstride
 radius = 200
 def get_part_id(filename):
     parts = filename.split(os.path.sep)[-1].split('_')[:-1]
@@ -18,7 +19,9 @@ def get_part_id(filename):
 # mode==1, col+radius
 # mode==2, row+radius
 def process_row(item, mode=0):
+    # note that the x,y from the star file originates from left bottom
     x, y, path = item # center
+    # y = h-y # 原坐标是左下角为原点
 
     grid_c = x // cstride
     grid_r = y // rstride
@@ -43,7 +46,7 @@ def process_row(item, mode=0):
         left,right = max(x-radius,bl),min(x+radius,br)
         up,down = max(y-radius,bu),min(y+radius,bd)
         ofl,ofu,ofr,ofd = left-bl,up-bu, right-bl,down-bu
-        outs.append((realname, left, up, right, down, ofl,ofu,ofr,ofd))
+
     elif dy<=0.5*radius: # grid_r-1 +radius
         imgno = (grid_r-1) * max_nc + grid_c + 2*max_nc*max_nr
 
@@ -75,15 +78,15 @@ def process_row(item, mode=0):
 
     return pd.DataFrame(outs)
 
-# df = pd.read_csv(spath,usecols=usecols)
+df = pd.read_csv(spath,usecols=usecols)
 # # df.columns = ['x','y','path']
-# df = df.values
+df = df.values
 # # ndf = list()
-# pd.DataFrame([['realname','left','up','right','down','ofl','ofu','ofr','ofd']]).to_csv(tpath, mode='w', index=False, header=False)
-# for item in df:
-#     print(item[-1])
-#     ndf = process_row(item)
-#     ndf.to_csv(tpath, mode='a', index=False, header=False)
+pd.DataFrame([['realname','left','up','right','down','ofl','ofu','ofr','ofd']]).to_csv(tpath, mode='w', index=False, header=False)
+for item in df:
+    print(item[-1])
+    ndf = process_row(item)
+    ndf.to_csv(tpath, mode='a', index=False, header=False)
 
 df = pd.read_csv(tpath)
 dicts = list()
