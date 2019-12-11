@@ -6,10 +6,10 @@ import os.path as osp
 spath = osp.join('anno','particles.csv')
 tpath = osp.join('anno', 'patches.csv')
 usecols = ['_rlnCoordinateX', '_rlnCoordinateY', '_rlnMicrographName']
-h,w = 7676,7420
-rstride, cstride = 1919, 1484
-max_nr,max_nc = h // rstride, w // cstride
-radius = 200
+Y, X = 7676, 7420
+ystride, xstride = 1919, 1484
+max_yn, max_xn = Y // ystride, X // xstride
+radius = 150
 def get_part_id(filename):
     parts = filename.split(os.path.sep)[-1].split('_')[:-1]
     particle_id = '_'.join(parts)+'.png'
@@ -23,58 +23,97 @@ def process_row(item, mode=0):
     x, y, path = item # center
     # y = h-y # 原坐标是左下角为原点
 
-    grid_c = x // cstride
-    grid_r = y // rstride
+    grid_x = x // xstride
+    grid_y = y // ystride
 
     outs = list()
     ans = list()
-    imgno = grid_r*max_nc + grid_c
-    bl,bu,br,bd = grid_c*cstride, grid_r*rstride, (grid_c+1)*cstride, (grid_r+1)*rstride
-    realname = path.split('.')[0]+f'_{str(int(imgno+mode*max_nr*max_nc))}.png'
+    imgno = grid_y * max_xn + grid_x
+    bl,bu,br,bd = grid_x * xstride, grid_y * ystride, (grid_x + 1) * xstride, (grid_y + 1) * ystride
+    realname = path.split('.')[0]+f'_{str(int(imgno))}.png'
     left,right = max(x-radius,bl),min(x+radius,br)
     up,down = max(y-radius,bu),min(y+radius,bd)
     ofl, ofu, ofr, ofd = left - bl, up - bu, right - bl, down - bu
     outs.append((realname, left, up, right, down, ofl, ofu, ofr, ofd))
 
-    dy,dx = y%rstride, x%cstride
-    # grid_r +radius
-    if dy>radius+0.5*radius:
-        imgno = grid_r * max_nc + grid_c + 2*max_nc*max_nr
+    dy,dx = y % ystride, x % xstride
+    if dy > 2*radius:
+        imgno = grid_y * max_xn + grid_x + 2 * max_xn * max_yn
 
-        bl, bu, br, bd = grid_c * cstride, grid_r * rstride+radius, (grid_c + 1) * cstride, (grid_r + 1) * rstride+radius
+        bl, bu, br, bd = grid_x * xstride, grid_y * ystride + 2*radius, (grid_x + 1) * xstride, (grid_y + 1) * ystride + 2*radius
         realname = path.split('.')[0]+f'_{str(int(imgno))}.png'
         left,right = max(x-radius,bl),min(x+radius,br)
         up,down = max(y-radius,bu),min(y+radius,bd)
         ofl,ofu,ofr,ofd = left-bl,up-bu, right-bl,down-bu
+        outs.append((realname, left, up, right, down, ofl, ofu, ofr, ofd))
+    else:
+        imgno = (grid_y-1) * max_xn + grid_x + 2 * max_xn * max_yn
 
-    elif dy<=0.5*radius: # grid_r-1 +radius
-        imgno = (grid_r-1) * max_nc + grid_c + 2*max_nc*max_nr
+        bl, bu, br, bd = grid_x * xstride, (grid_y-1) * ystride + 2 * radius, (grid_x + 1) * xstride, grid_y * ystride + 2 * radius
 
-        bl, bu, br, bd = grid_c * cstride, (grid_r-1) * rstride+radius, (grid_c + 1) * cstride, (grid_r) * rstride+radius
+        realname = path.split('.')[0] + f'_{str(int(imgno))}.png'
+        left, right = max(x - radius, bl), min(x + radius, br)
+        up, down = max(y - radius, bu), min(y + radius, bd)
+        ofl, ofu, ofr, ofd = left - bl, up - bu, right - bl, down - bu
+        outs.append((realname, left, up, right, down, ofl, ofu, ofr, ofd))
+
+    if dx > 2*radius :
+        imgno = grid_y * max_xn + grid_x + 1 * max_xn * max_yn
+
+        bl, bu, br, bd = grid_x * xstride + 2*radius, grid_y * ystride, (grid_x + 1) * xstride + 2*radius, (grid_y + 1) * ystride
         realname = path.split('.')[0]+f'_{str(int(imgno))}.png'
         left,right = max(x-radius,bl),min(x+radius,br)
         up,down = max(y-radius,bu),min(y+radius,bd)
         ofl, ofu, ofr, ofd = left - bl, up - bu, right - bl, down - bu
         outs.append((realname, left, up, right, down, ofl,ofu,ofr,ofd))
+    else:
+        imgno = grid_y * max_xn + grid_x -1 + 1 * max_xn * max_yn
 
-    if dx>radius+0.5*radius:# the left margin is at least 100
-        imgno = grid_r * max_nc + grid_c + 1*max_nc*max_nr
-
-        bl, bu, br, bd = grid_c * cstride+radius, grid_r * rstride, (grid_c + 1) * cstride+radius, (grid_r + 1) * rstride
-        realname = path.split('.')[0]+f'_{str(int(imgno))}.png'
-        left,right = max(x-radius,bl),min(x+radius,br)
-        up,down = max(y-radius,bu),min(y+radius,bd)
+        bl, bu, br, bd = (grid_x-1) * xstride + 2 * radius, grid_y * ystride, grid_x * xstride + 2 * radius, (grid_y + 1) * ystride
+        realname = path.split('.')[0] + f'_{str(int(imgno))}.png'
+        left, right = max(x - radius, bl), min(x + radius, br)
+        up, down = max(y - radius, bu), min(y + radius, bd)
         ofl, ofu, ofr, ofd = left - bl, up - bu, right - bl, down - bu
-        outs.append((realname, left, up, right, down, ofl,ofu,ofr,ofd))
-    elif dx<=0.5*radius: # grid_c-1 +radius, the right margin is at least 100
-        imgno = grid_r * max_nc + grid_c -1 + 1*max_nc*max_nr
+        outs.append((realname, left, up, right, down, ofl, ofu, ofr, ofd))
 
-        bl, bu, br, bd = (grid_c-1) * cstride+radius, grid_r * rstride, (grid_c) * cstride+radius, (grid_r + 1) * rstride
-        realname = path.split('.')[0]+f'_{str(int(imgno))}.png'
-        left,right = max(x-radius,bl),min(x+radius,br)
-        up,down = max(y-radius,bu),min(y+radius,bd)
-        ofl, ofu, ofr, ofd = left - bl, up - bu, right - bl, down - bu
-        outs.append((realname, left, up, right, down, ofl,ofu,ofr,ofd))
+    # grid_r +radius
+    # if dy>radius+0.5*radius:
+    #     imgno = grid_y * max_xn + grid_x + 2 * max_xn * max_yn
+    #
+    #     bl, bu, br, bd = grid_x * xstride, grid_y * ystride + radius, (grid_x + 1) * xstride, (grid_y + 1) * ystride + radius
+    #     realname = path.split('.')[0]+f'_{str(int(imgno))}.png'
+    #     left,right = max(x-radius,bl),min(x+radius,br)
+    #     up,down = max(y-radius,bu),min(y+radius,bd)
+    #     ofl,ofu,ofr,ofd = left-bl,up-bu, right-bl,down-bu
+    #
+    # elif dy<=0.5*radius: # grid_r-1 +radius
+    #     imgno = (grid_y-1) * max_xn + grid_x + 2 * max_xn * max_yn
+    #
+    #     bl, bu, br, bd = grid_x * xstride, (grid_y - 1) * ystride + radius, (grid_x + 1) * xstride, (grid_y) * ystride + radius
+    #     realname = path.split('.')[0]+f'_{str(int(imgno))}.png'
+    #     left,right = max(x-radius,bl),min(x+radius,br)
+    #     up,down = max(y-radius,bu),min(y+radius,bd)
+    #     ofl, ofu, ofr, ofd = left - bl, up - bu, right - bl, down - bu
+    #     outs.append((realname, left, up, right, down, ofl,ofu,ofr,ofd))
+    #
+    # if dx>radius+0.5*radius:# the left margin is at least 100
+    #     imgno = grid_y * max_xn + grid_x + 1 * max_xn * max_yn
+    #
+    #     bl, bu, br, bd = grid_x * xstride + radius, grid_y * ystride, (grid_x + 1) * xstride + radius, (grid_y + 1) * ystride
+    #     realname = path.split('.')[0]+f'_{str(int(imgno))}.png'
+    #     left,right = max(x-radius,bl),min(x+radius,br)
+    #     up,down = max(y-radius,bu),min(y+radius,bd)
+    #     ofl, ofu, ofr, ofd = left - bl, up - bu, right - bl, down - bu
+    #     outs.append((realname, left, up, right, down, ofl,ofu,ofr,ofd))
+    # elif dx<=0.5*radius: # grid_c-1 +radius, the right margin is at least 100
+    #     imgno = grid_y * max_xn + grid_x - 1 + 1 * max_xn * max_yn
+    #
+    #     bl, bu, br, bd = (grid_x-1) * xstride + radius, grid_y * ystride, (grid_x) * xstride + radius, (grid_y + 1) * ystride
+    #     realname = path.split('.')[0]+f'_{str(int(imgno))}.png'
+    #     left,right = max(x-radius,bl),min(x+radius,br)
+    #     up,down = max(y-radius,bu),min(y+radius,bd)
+    #     ofl, ofu, ofr, ofd = left - bl, up - bu, right - bl, down - bu
+    #     outs.append((realname, left, up, right, down, ofl,ofu,ofr,ofd))
 
     return pd.DataFrame(outs)
 
@@ -101,9 +140,9 @@ for k,g in df.groupby('realname'):
         print(filename, partname)
         continue
     cnt2 += 1
-    h,w = rstride, cstride
+    Y, X = ystride, xstride
     g = g[['ofl','ofu','ofr','ofd']].values.tolist()
-    dicts.append(dict(filename=filename, height=h,width=w, annotations=g))
+    dicts.append(dict(filename=filename, height=Y, width=X, annotations=g))
 
 print(f'{cnt2}/{cnt1} patches are kept.')
 

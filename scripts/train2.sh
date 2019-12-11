@@ -8,8 +8,7 @@ python tools/train_net2.py --num-gpus 4 --config-file configs/PART-Detection/par
        OUTPUT_DIR "$output_dir" \
        SOLVER.OPTIMIZER 'Adam' \
        SOLVER.IMS_PER_BATCH 8 \
-       SOLVER.BASE_LR 0.005 \
-       SOLVER.LR_SCHEDULER_NAME "WarmupMultiStepLR" \
+       SOLVER.BASE_LR 0.0005 \
        SOLVER.MAX_ITER 20000 \
        DATALOADER.NUM_WORKERS 0 \
        TEST.EVAL_PERIOD 200

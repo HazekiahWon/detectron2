@@ -6,4 +6,4 @@ MODEL:
   WEIGHTS: "model_weights/COCO-Detection/faster_rcnn_R_50_C4_3x/model_final_f97cb7.pkl"
 SOLVER:
   OPTIMIZER: "Adam"
-  LR_SCHEDULER_NAME: "WarmupMultiStepLR"
+#  LR_SCHEDULER_NAME: "WarmupMultiStepLR"

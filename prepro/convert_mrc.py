@@ -98,7 +98,7 @@ def proc_im(imgp, sigma=1., ratio=.99, nsig=1.):
     img = low_pass(img, sigma) # can tune this param
     img2 = correction(img,ratio, nsig)
 #     img2 = low_pass(img2, sigma)
-    # img = bin_2d(img, 2)
+    img2 = bin_2d(img, 3)
     return img2.astype(np.uint8)
 
 if __name__ == '__main__':
